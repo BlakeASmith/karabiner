@@ -1,8 +1,12 @@
 import {
+    BasicManipulatorBuilder,
+    FromEvent,
     ifApp,
   ifVar,
   layer,
+  ManipulatorBuilder,
   map,
+  mapSimultaneous,
   NumberKeyValue,
   rule,
   toSetVar,
@@ -37,12 +41,16 @@ const shiftEsc = rule("Tap shift for Escape")
             })
     ])
 
+const launcherModeTriggers = (...manipulators: BasicManipulatorBuilder[]) => manipulators.map(
+    (b) => b.toVar("launcher-mode")
+        .toNotificationMessage('launcher-mode-notification', `t=ITerm, f/b=Firefox, g=Chrome, s=Slack, k=Kibana, Esc=nothing 0=Karabiner-EventViewer, k=KibanaAWSElectron, K=Kiro`)
+)
+
 
 const tab = layer("tab", "tab-mode")
     .manipulators([
-        map("a").toVar("launcher-mode")
-            // .toAfterKeyUp(toSetVar("launcher-mode", 0))
-            .toNotificationMessage('launcher-mode-notification', 'launcher-mode')
+        // Enter "launcher" mode to start programs
+        ...launcherModeTriggers(map("a"), map("l"))
     ])
 
     rule("tab for lots of things")
@@ -51,20 +59,32 @@ const tab = layer("tab", "tab-mode")
     ])
 
 
-const launcherMode = rule('Keybindings in launcher mode', ifVar('launcher-mode'))
-    .manipulators([
-        map('t')
+const mapLauncherMode = (key: FromEvent | string | number) => map(key as FromEvent)
           .toAfterKeyUp(toSetVar("launcher-mode", 0))
           .toRemoveNotificationMessage("launcher-mode-notification")
-          .toApp("ITerm")
-    ])
+
+const launcherMode = [rule('Keybindings in launcher mode', ifVar('launcher-mode'))
+    .manipulators([
+        mapLauncherMode("t").toApp("ITerm"),
+        mapLauncherMode("g").toApp("Google Chrome"),
+        mapLauncherMode("f").toApp("Firefox"),
+        mapLauncherMode("b").toApp("Firefox"),
+        mapLauncherMode("s").toApp("Slack"),
+        mapLauncherMode("k").toApp("KibanaAWSElectron"),
+        mapLauncherMode(0).toApp("Karabiner-EventViewer"),
+        mapLauncherMode({key_code: "k", modifiers: { mandatory: ["left_shift"] }}).toApp("Kiro"),
+        mapLauncherMode("escape") // Don't do anything, just exit the mode
+    ]),
+    rule("Trigger launcher mode with a+l").manipulators(launcherModeTriggers(mapSimultaneous(["a", "l"]))),
+    rule("Trigger launcher mode with a+; (pinkys)").manipulators(launcherModeTriggers(mapSimultaneous(["a", ";"]))),
+]
 
 
 writeToProfile('Default', [
     capsLock,
-    shiftEsc,
+//    shiftEsc,
     tab,
-    launcherMode
+    ...launcherMode
 ], {
     // This seems to be the magic number for me for most things
     "basic.to_if_held_down_threshold_milliseconds": 110
