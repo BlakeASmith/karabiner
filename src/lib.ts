@@ -16,6 +16,7 @@ import {
   withCondition,
   withMapper,
   writeToProfile,
+  ConditionBuilder,
 } from "karabiner.ts";
 
 /**
@@ -27,7 +28,7 @@ export function map(event: FromEvent | string | number) {
   return originalMap(event);
 }
 
-const modeTriggers = (
+export const withModeEnter = (
   mode: string,
   message?: string,
   ...manipulators: BasicManipulatorBuilder[]
@@ -39,7 +40,10 @@ const modeTriggers = (
       : it;
   });
 
-const withModeExit = (mode: string, builder: BasicManipulatorBuilder) => {
+export const withModeExit = (
+  mode: string,
+  builder: BasicManipulatorBuilder,
+) => {
   return withCondition(ifVar(mode))([
     builder
       .toAfterKeyUp(toSetVar(mode, 0))
@@ -47,7 +51,10 @@ const withModeExit = (mode: string, builder: BasicManipulatorBuilder) => {
   ]);
 };
 
-const withModeKeys = (mode: string, ...builder: BasicManipulatorBuilder[]) => {
+export const withModeExitKeys = (
+  mode: string,
+  ...builder: BasicManipulatorBuilder[]
+) => {
   return builder.map((b) => withModeExit(mode, b));
 };
 
@@ -61,30 +68,77 @@ export type BindingMap<ActionType> = {
   [key: string | number]: ActionType;
 };
 
-export type Mode<ActionType> = {
+export type ModeProps<ActionType> = {
   name: string;
   description: string;
   hint?: string;
-  triggers: BasicManipulatorBuilder[];
-  manipulators: BasicManipulatorBuilder[];
+  triggers: BasicManipulatorBuilder[] | never[];
+  manipulators: BasicManipulatorBuilder[] | never[];
+  mappingConditions?: ConditionBuilder[];
+  triggerConditions?: ConditionBuilder[];
+  isOneShotMode?: boolean;
 };
 
-export function mode<ActionType>(mode: Mode<ActionType>): RuleBuilder[] {
-  let triggersManipulators = modeTriggers(
-    mode.name,
-    mode.hint,
-    ...mode.triggers,
-  );
-  let triggersRule = rule(`${mode.name}: ${mode.description}`).manipulators(
-    triggersManipulators,
-  );
-  return [
-    triggersRule,
-    rule(`Key assignments for ${mode.name}`).manipulators(
-      mode.manipulators.map((b) => withModeExit(mode.name, b)),
-    ),
-    rule(`Escape ${mode.name}`).manipulators([
-      withModeExit(mode.name, map("escape")),
-    ]),
-  ];
+export type Mode<ActionType> = {
+  addTrigger: (manupulator: BasicManipulatorBuilder) => BasicManipulatorBuilder;
+  addMapping: (manupulator: BasicManipulatorBuilder) => void;
+  withExit: (b: BasicManipulatorBuilder) => Manipulator[] | ManipulatorBuilder;
+};
+
+export type BuildableMode<ActionType> = Mode<ActionType> & {
+  build: () => RuleBuilder[];
+};
+
+export function mode<ActionType>(
+  mode: ModeProps<ActionType>,
+): BuildableMode<ActionType> {
+  let triggers: BasicManipulatorBuilder[] = [];
+  let manipulators: (
+    | BasicManipulatorBuilder
+    | (Manipulator[] & ManipulatorBuilder)
+  )[] = [];
+  let finalMode: Mode<ActionType> = {
+    addTrigger: (b: BasicManipulatorBuilder) => {
+      let trigger = withModeEnter(mode.name, mode.hint, b)[0];
+      triggers.push(trigger);
+      return trigger;
+    },
+    addMapping: (b: BasicManipulatorBuilder) => {
+      if (mode.isOneShotMode === true) {
+        manipulators.push(withModeExit(mode.name, b));
+      } else {
+        manipulators.push(b);
+      }
+    },
+    withExit: (b: BasicManipulatorBuilder) => withModeExit(mode.name, b),
+  };
+
+  mode.triggers.forEach(finalMode.addTrigger);
+  mode.manipulators.forEach(finalMode.addMapping);
+
+  // Escape to exit the mode and do nothing else
+  finalMode.addMapping(map("escape"));
+
+  const build = () => {
+    let triggersRule = rule(
+      `${mode.name}: ${mode.description}`,
+      ...(mode.triggerConditions ? mode.triggerConditions : []),
+    ).manipulators(triggers);
+
+    return [
+      triggersRule,
+      rule(
+        `Key assignments for ${mode.name}`,
+        ...(mode.mappingConditions ? mode.mappingConditions : []),
+      ).manipulators(manipulators),
+      rule(`Escape ${mode.name}`).manipulators([
+        withModeExit(mode.name, map("escape")),
+      ]),
+    ];
+  };
+
+  return {
+    ...finalMode,
+    build,
+  };
 }
