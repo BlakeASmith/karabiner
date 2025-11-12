@@ -114,6 +114,7 @@ export function mode<ActionType>(
     | BasicManipulatorBuilder
     | (Manipulator[] & ManipulatorBuilder)
   )[] = [];
+  const oneShotKeysSet = new Set(mode.oneShotKeys || []);
   let finalMode: Mode<ActionType> = {
     addTrigger: (b: BasicManipulatorBuilder) => {
       let trigger = withModeEnter(mode.name, mode.hint, b)[0];
@@ -121,7 +122,7 @@ export function mode<ActionType>(
       return trigger;
     },
     addMapping: (b: BasicManipulatorBuilder) => {
-      if (mode.isOneShotMode === true) {
+      if (mode.isOneShotMode === true || oneShotKeysSet.has(b)) {
         manipulators.push(withModeExit(mode.name, b));
       } else {
         manipulators.push(b);
@@ -132,11 +133,8 @@ export function mode<ActionType>(
 
   mode.triggers.forEach(finalMode.addTrigger);
   mode.manipulators.forEach(finalMode.addMapping);
-  // Process oneShotKeys separately - they always get one-shot behavior
   if (mode.oneShotKeys) {
-    mode.oneShotKeys.forEach((b) => {
-      manipulators.push(withModeExit(mode.name, b));
-    });
+    mode.oneShotKeys.forEach(finalMode.addMapping);
   }
 
   const build = () => {
