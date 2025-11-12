@@ -103,6 +103,10 @@ const homeRowMods = rule("Home row mods").manipulators([
   // S/L -> Command
   map("s").toIfHeldDown("left_command").toIfAlone("s"),
   map("l").toIfHeldDown("left_command").toIfAlone("l"),
+  // Simultaneous j+k -> Escape
+  mapSimultaneous(["j", "k"]).to({ key_code: "escape" }),
+  // Simultaneous s+d -> Escape
+  mapSimultaneous(["s", "d"]).to({ key_code: "escape" }),
 ]);
 
 const capsLock = rule("CapsLock for lots of things").manipulators([
