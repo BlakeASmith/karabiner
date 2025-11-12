@@ -29,6 +29,14 @@ All mappings have been verified against official Firefox keyboard shortcuts.
 | `Shift+W` | New Window | ⌘N (Cmd+N) | ✅ Verified |
 | `s` | Save Page | ⌘S (Cmd+S) | ✅ Verified |
 
+## Raycast Integrations
+
+| Vim Key | Action | Raycast Command | Status |
+|---------|-------|----------------|--------|
+| `Shift+T` | Search Browser Tabs | `raycast://extensions/raycast/browser-tabs/search-tabs` | ✅ Added |
+| `Shift+G` | Search Browser History | `raycast://extensions/raycast/browser-history/search-history` | ✅ Added |
+| `Shift+Q` | Search Quicklinks | `raycast://extensions/raycast/quicklinks/search-quicklinks` | ✅ Added |
+
 ## Key Code Mappings
 
 - `close_bracket` = `]` (right square bracket)

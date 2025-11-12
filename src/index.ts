@@ -30,6 +30,10 @@ import {
 import { join } from "path";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
+const RAYCAST_BROWSER_HISTORY = "open -g raycast://extensions/raycast/browser-history/search-history";
+const RAYCAST_BROWSER_BOOKMARKS = "open -g raycast://extensions/raycast/browser-bookmarks/search-bookmarks";
+const RAYCAST_BROWSER_TABS = "open -g raycast://extensions/raycast/browser-tabs/search-tabs";
+const RAYCAST_QUICKLINKS = "open -g raycast://extensions/raycast/quicklinks/search-quicklinks";
 const isTerminal = ifApp("^.*.iterm2.*$");
 const isNotTerminal = isTerminal.unless();
 const isFirefox = ifApp("^.*firefox.*$");
@@ -58,7 +62,7 @@ const itermCommandMode = mode({
 });
 
 const FIREFOX_COMMAND_MODE = "firefox-commands";
-const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | f: find | ;/,: find next/prev | n/p: next/prev tab | r: reload | R: hard reload | h/l: back/forward | 1-9: switch tab | b: bookmarks | D: downloads | H: history | W: new window | s: save | y: downloads";
+const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | f: find | ;/,: find next/prev | n/p/g: next/prev tab | r: reload | R: hard reload | h/l: back/forward | 1-9: switch tab | b: bookmarks | D: downloads | H: history | W: new window | s: save | y: downloads | G: raycast history | Q: raycast quicklinks | T: raycast tabs";
 const firefoxCommandMode = mode({
   name: FIREFOX_COMMAND_MODE,
   description: "Firefox browser controls",
@@ -94,6 +98,7 @@ const firefoxCommandMode = mode({
     // Tab switching
     map("n").to({ key_code: "close_bracket", modifiers: ["left_command", "left_shift"] }), // Next tab
     map("p").to({ key_code: "open_bracket", modifiers: ["left_command", "left_shift"] }), // Previous tab
+    map("g").to({ key_code: "close_bracket", modifiers: ["left_command", "left_shift"] }), // Next tab (alternative, vim-style gt)
     
     // Switch to specific tab (1-9)
     map(1).to({ key_code: "1", modifiers: ["left_command"] }),
@@ -119,6 +124,11 @@ const firefoxCommandMode = mode({
     
     // Save page
     map("s").to({ key_code: "s", modifiers: ["left_command"] }), // Save page
+    
+    // Raycast integrations
+    map({ key_code: "t", modifiers: { mandatory: ["left_shift"] } }).to$(RAYCAST_BROWSER_TABS), // Raycast: Search browser tabs (T)
+    map({ key_code: "g", modifiers: { mandatory: ["left_shift"] } }).to$(RAYCAST_BROWSER_HISTORY), // Raycast: Search browser history (G)
+    map({ key_code: "q", modifiers: { mandatory: ["left_shift"] } }).to$(RAYCAST_QUICKLINKS), // Raycast: Search quicklinks (Q)
   ],
 });
 
