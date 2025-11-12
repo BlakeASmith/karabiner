@@ -1,6 +1,8 @@
 import {
   BasicManipulatorBuilder,
+  duoLayer,
   FromEvent,
+  hyperLayer,
   ifApp,
   ifVar,
   layer,
@@ -11,8 +13,12 @@ import {
   NumberKeyValue,
   rule,
   RuleBuilder,
+  simlayer,
+  ToEvent,
+  toHyper,
   toRemoveNotificationMessage,
   toSetVar,
+  toUnsetVar,
   withCondition,
   withMapper,
   writeToProfile,
@@ -30,6 +36,7 @@ import {
 import { firefoxCommandMode } from "./browser.ts";
 import { windowManagementMode } from "./window-management.ts";
 import { join } from "path";
+import { escape } from "querystring";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
 const isTerminal = ifApp("^.*.iterm2.*$");
@@ -42,7 +49,7 @@ const itermCommandMode = mode({
   name: ITERM_COMMAND_MODE,
   description: "Iterm2 control commands",
   hint: ITERM_COMMAND_MODE_HINT,
-  triggers: [mapSimultaneous(["d", "k"])],
+  triggers: [mapSimultaneous(["d", "k"]), mapSimultaneous(["k", "l"])],
   triggerConditions: [isTerminal],
   mappingConditions: [isTerminal],
   manipulators: [],
@@ -99,39 +106,157 @@ const launcherMode = mode({
   ],
 });
 
-const homeRowMods = rule("Home row mods").manipulators([
-  // F/J -> Control
-  map("f").toIfHeldDown("left_control").toIfAlone("f"),
-  map("j").toIfHeldDown("left_control").toIfAlone("j"),
-  // D/K -> Alt (Option)
-  map("d").toIfHeldDown("left_option").toIfAlone("d"),
-  map("k").toIfHeldDown("left_option").toIfAlone("k"),
-  // S/L -> Command
-  map("s").toIfHeldDown("left_command").toIfAlone("s"),
-  map("l").toIfHeldDown("left_command").toIfAlone("l"),
-  // Simultaneous j+k -> Escape
-  mapSimultaneous(["j", "k"]).to({ key_code: "escape" }),
-  // Simultaneous s+d -> Escape
-  mapSimultaneous(["s", "d"]).to({ key_code: "escape" }),
-]);
+type HomeRowKeyOptions = {
+  toIfHeldDown: ToEvent[];
+  toIfAlone: ToEvent[];
+};
+
+type HomeRowCombos = {
+  fd_jk?: HomeRowKeyOptions;
+  ds_kl?: HomeRowKeyOptions;
+  // sa_lsemicolon?: HomeRowKeyOptions;
+  // af_jsemicolon?: HomeRowKeyOptions;
+  // fs_jl?: HomeRowKeyOptions;
+};
+
+const ALPHA_ROW1 = "qwertyuiop".split("");
+const ROW1 = [..."qwertyuiop[]".split(""), "\\"];
+const ALPHA_ROW2 = "asdfghjkl".split("");
+const ROW2 = "asdfghjkl;'".split("");
+const ALPHA_ROW3 = "zxcvbnm".split("");
+const ROW3 = "zxcvbnm,./".split("");
+
+const ALPHA_ALL = [...ALPHA_ROW1, ...ALPHA_ROW2, ...ALPHA_ROW3];
+
+function homeRow(combos: HomeRowCombos) {
+  let rules: RuleBuilder[] = [];
+  if (combos.fd_jk !== undefined) {
+    rules.push(
+      rule("Sticky Conrol on fd or jk").manipulators(
+        [
+          ["f", "d"],
+          ["j", "k"],
+        ].map(([f, d]) =>
+          mapSimultaneous([f, d])
+            .toIfHeldDown(combos.fd_jk.toIfHeldDown)
+            .toIfAlone(combos.fd_jk.toIfAlone),
+        ),
+      ),
+    );
+  }
+  if (combos.ds_kl !== undefined) {
+    rules.push(
+      rule("Sticky Conrol on ds or kl").manipulators(
+        [
+          ["d", "s"],
+          ["k", "l"],
+        ].map(([f, d]) =>
+          mapSimultaneous([f, d])
+            .toIfHeldDown(combos.ds_kl.toIfHeldDown)
+            .toIfAlone(combos.ds_kl.toIfAlone),
+        ),
+      ),
+    );
+  }
+  return rules;
+}
+
+let _homeRow = homeRow({
+  fd_jk: {
+    toIfAlone: [
+      {
+        sticky_modifier: {
+          left_control: "toggle",
+        },
+      },
+    ],
+    toIfHeldDown: [
+      {
+        key_code: "left_control",
+      },
+    ],
+  },
+  ds_kl: {
+    toIfAlone: [
+      {
+        sticky_modifier: {
+          left_option: "toggle",
+        },
+      },
+    ],
+    toIfHeldDown: [
+      {
+        key_code: "left_option",
+      },
+    ],
+  },
+});
 
 const capsLock = rule("CapsLock for lots of things").manipulators([
   // Use for tmux leader key if in a terminal application
-  withCondition(isTerminal)([map("caps_lock").toIfAlone("a", "left_control")]),
+  withCondition(isTerminal)([
+    map("caps_lock").toIfAlone("a", "left_control").toIfHeldDown(toHyper()),
+  ]),
   withCondition(isNotTerminal)([
-    map("caps_lock").toIfAlone("caps_lock"), // For now.....
+    map("caps_lock").toIfAlone("caps_lock").toIfHeldDown(toHyper()), // For now.....
   ]),
 ]);
+
+let sublayerEscape = [
+  toUnsetVar("sublayer"),
+  toRemoveNotificationMessage("sublayer"),
+];
+
+let t_sublayer = rule("Sublayers", ifVar("sublayer", "t")).manipulators([
+  map("g")
+    .to$("open -g raycast://extensions/raycast/raycast/confetti")
+    .toAfterKeyUp(sublayerEscape),
+]);
+
+const raycastLayer = hyperLayer("r", "raycast-mode")
+  .leaderMode()
+  .notification(true)
+  .manipulators([
+    map("t")
+      .toVar("sublayer", "t")
+      .toNotificationMessage("sublayer", "Sublayer active t"),
+    map("k").to$("open -g raycast://extensions/rolandleth/kill-process/index"),
+    map("f").to$("open -g raycast://script-commands/open-iterm-here"),
+    map("m").to$(
+      "open -g raycast://extensions/raycast/window-management/almost-maximize",
+    ),
+  ]);
+
+const windowLayer = hyperLayer("w", "window-mode")
+  .leaderMode()
+  .notification(true)
+  .manipulators([
+    map("n").to$(
+      "open -g raycast://extensions/raycast/window-management/almost-maximize",
+    ),
+    map("m").to$(
+      "open -g raycast://extensions/raycast/window-management/maximize",
+    ),
+    map("l").to$(
+      "open -g raycast://extensions/raycast/window-management/right-half",
+    ),
+    map("h").to$(
+      "open -g raycast://extensions/raycast/window-management/left-half",
+    ),
+  ]);
 
 writeToProfile(
   "Default",
   [
-    homeRowMods,
+    ..._homeRow,
     capsLock,
+    raycastLayer,
+    t_sublayer,
+    windowLayer,
     ...launcherMode.build(),
     ...itermCommandMode.build(),
     ...firefoxCommandMode.build(),
-    ...windowManagementMode.build(),
+    // ...windowManagementMode.build(),
     // !important this needs to happen after all modes are defined
     // Any extra re-mapping of Escape key needs to be done here as well
     rule("escape modes").manipulators([
