@@ -32,6 +32,7 @@ import { join } from "path";
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
 const isTerminal = ifApp("^.*.iterm2.*$");
 const isNotTerminal = isTerminal.unless();
+const isFirefox = ifApp("^.*firefox.*$");
 
 const ITERM_COMMAND_MODE = "iterm-commands";
 const ITERM_COMMAND_MODE_HINT = "s: horizontal split | v: vertical split | t: new tab | w: new window | 1-5: tab colors";
@@ -53,6 +54,54 @@ const itermCommandMode = mode({
     map(3).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 3"`),
     map(4).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 4"`),
     map(5).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 5"`),
+  ],
+});
+
+const FIREFOX_COMMAND_MODE = "firefox-commands";
+const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | r: reload | h/l: back/forward | n/p: next/prev tab | 1-9: switch tab | b: bookmarks";
+const firefoxCommandMode = mode({
+  name: FIREFOX_COMMAND_MODE,
+  description: "Firefox browser controls",
+  hint: FIREFOX_COMMAND_MODE_HINT,
+  isOneShotMode: true,
+  triggers: [mapSimultaneous(["d", "k"])],
+  triggerConditions: [isFirefox],
+  mappingConditions: [isFirefox],
+  manipulators: [
+    // Tab management
+    map("t").to({ key_code: "t", modifiers: ["left_command"] }), // New tab
+    map("d").to({ key_code: "w", modifiers: ["left_command"] }), // Close tab
+    map("x").to({ key_code: "w", modifiers: ["left_command"] }), // Close tab (alternative)
+    map("u").to({ key_code: "t", modifiers: ["left_command", "left_shift"] }), // Reopen closed tab
+    
+    // Navigation
+    map("h").to({ key_code: "left_arrow", modifiers: ["left_command"] }), // Back
+    map("l").to({ key_code: "right_arrow", modifiers: ["left_command"] }), // Forward
+    
+    // Address bar and search
+    map("o").to({ key_code: "l", modifiers: ["left_command"] }), // Address bar
+    map("/").to({ key_code: "k", modifiers: ["left_command"] }), // Search
+    
+    // Reload
+    map("r").to({ key_code: "r", modifiers: ["left_command"] }), // Reload
+    
+    // Tab switching
+    map("n").to({ key_code: "close_bracket", modifiers: ["left_command", "left_shift"] }), // Next tab
+    map("p").to({ key_code: "open_bracket", modifiers: ["left_command", "left_shift"] }), // Previous tab
+    
+    // Switch to specific tab (1-9)
+    map(1).to({ key_code: "1", modifiers: ["left_command"] }),
+    map(2).to({ key_code: "2", modifiers: ["left_command"] }),
+    map(3).to({ key_code: "3", modifiers: ["left_command"] }),
+    map(4).to({ key_code: "4", modifiers: ["left_command"] }),
+    map(5).to({ key_code: "5", modifiers: ["left_command"] }),
+    map(6).to({ key_code: "6", modifiers: ["left_command"] }),
+    map(7).to({ key_code: "7", modifiers: ["left_command"] }),
+    map(8).to({ key_code: "8", modifiers: ["left_command"] }),
+    map(9).to({ key_code: "9", modifiers: ["left_command"] }),
+    
+    // Bookmarks
+    map("b").to({ key_code: "b", modifiers: ["left_command", "left_shift"] }), // Bookmarks sidebar
   ],
 });
 
@@ -105,6 +154,7 @@ writeToProfile(
     capsLock,
     ...launcherMode.build(),
     ...itermCommandMode.build(),
+    ...firefoxCommandMode.build(),
     // !important this needs to happen after all modes are defined
     // Any extra re-mapping of Escape key needs to be done here as well
     rule("escape modes").manipulators([
