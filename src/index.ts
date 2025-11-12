@@ -100,6 +100,9 @@ const homeRowMods = rule("Home row mods").manipulators([
   // D/K -> Alt (Option)
   map("d").toIfHeldDown("left_option").toIfAlone("d"),
   map("k").toIfHeldDown("left_option").toIfAlone("k"),
+  // S/L -> Command
+  map("s").toIfHeldDown("left_command").toIfAlone("s"),
+  map("l").toIfHeldDown("left_command").toIfAlone("l"),
 ]);
 
 const capsLock = rule("CapsLock for lots of things").manipulators([
