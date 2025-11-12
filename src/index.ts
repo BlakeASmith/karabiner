@@ -58,7 +58,7 @@ const itermCommandMode = mode({
 });
 
 const FIREFOX_COMMAND_MODE = "firefox-commands";
-const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | r: reload | h/l: back/forward | n/p: next/prev tab | 1-9: switch tab | b: bookmarks";
+const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | r: reload | R: hard reload | h/l: back/forward | n/p: next/prev tab | 1-9: switch tab | b: bookmarks";
 const firefoxCommandMode = mode({
   name: FIREFOX_COMMAND_MODE,
   description: "Firefox browser controls",
@@ -84,6 +84,7 @@ const firefoxCommandMode = mode({
     
     // Reload
     map("r").to({ key_code: "r", modifiers: ["left_command"] }), // Reload
+    map({ key_code: "r", modifiers: { mandatory: ["left_shift"] } }).to({ key_code: "r", modifiers: ["left_command", "left_shift"] }), // Hard reload
     
     // Tab switching
     map("n").to({ key_code: "close_bracket", modifiers: ["left_command", "left_shift"] }), // Next tab
