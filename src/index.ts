@@ -93,6 +93,22 @@ const launcherMode = mode({
   ],
 });
 
+const homeRowMods = rule("Home row mods").manipulators([
+  // F/J -> Control
+  map("f").toIfHeldDown("left_control").toIfAlone("f"),
+  map("j").toIfHeldDown("left_control").toIfAlone("j"),
+  // D/K -> Alt (Option)
+  map("d").toIfHeldDown("left_option").toIfAlone("d"),
+  map("k").toIfHeldDown("left_option").toIfAlone("k"),
+  // S/L -> Command
+  map("s").toIfHeldDown("left_command").toIfAlone("s"),
+  map("l").toIfHeldDown("left_command").toIfAlone("l"),
+  // Simultaneous j+k -> Escape
+  mapSimultaneous(["j", "k"]).to({ key_code: "escape" }),
+  // Simultaneous s+d -> Escape
+  mapSimultaneous(["s", "d"]).to({ key_code: "escape" }),
+]);
+
 const capsLock = rule("CapsLock for lots of things").manipulators([
   // Use for tmux leader key if in a terminal application
   withCondition(isTerminal)([map("caps_lock").toIfAlone("a", "left_control")]),
@@ -104,6 +120,7 @@ const capsLock = rule("CapsLock for lots of things").manipulators([
 writeToProfile(
   "Default",
   [
+    homeRowMods,
     capsLock,
     ...launcherMode.build(),
     ...itermCommandMode.build(),
