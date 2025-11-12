@@ -34,7 +34,7 @@ const isTerminal = ifApp("^.*.iterm2.*$");
 const isNotTerminal = isTerminal.unless();
 
 const ITERM_COMMAND_MODE = "iterm-commands";
-const ITERM_COMMAND_MODE_HINT = "s: vertical split";
+const ITERM_COMMAND_MODE_HINT = "s: horizontal split | v: vertical split | t: new tab | w: new window | 1-5: tab colors";
 const itermCommandMode = mode({
   name: ITERM_COMMAND_MODE,
   description: "Iterm2 control commands",
@@ -43,7 +43,17 @@ const itermCommandMode = mode({
   triggers: [mapSimultaneous(["d", "k"])],
   triggerConditions: [isTerminal],
   mappingConditions: [isTerminal],
-  manipulators: [map("s").to$(`/bin/zsh -c "~/.local/bin/itermctl vsplit"`)],
+  manipulators: [
+    map("s").to$(`/bin/zsh -c "~/.local/bin/itermctl hsplit"`),
+    map("v").to$(`/bin/zsh -c "~/.local/bin/itermctl vsplit"`),
+    map("t").to$(`/bin/zsh -c "~/.local/bin/itermctl newtab"`),
+    map("w").to$(`/bin/zsh -c "~/.local/bin/itermctl newwindow"`),
+    map(1).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 1"`),
+    map(2).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 2"`),
+    map(3).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 3"`),
+    map(4).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 4"`),
+    map(5).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 5"`),
+  ],
 });
 
 const launcherMode = mode({
