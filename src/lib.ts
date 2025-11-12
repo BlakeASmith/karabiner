@@ -17,7 +17,23 @@ import {
   withMapper,
   writeToProfile,
   ConditionBuilder,
+  toRemoveNotificationMessage,
 } from "karabiner.ts";
+
+const MODES: BuildableMode<any>[] = [];
+
+function allModeConditions() {
+  return MODES.map((m) => mode.name).map((m) => ifVar(m));
+}
+
+export function withExitAllModes(b: BasicManipulatorBuilder) {
+  return b.to(
+    MODES.flatMap((m) => [
+      toSetVar(mode.name, 0),
+      toRemoveNotificationMessage(`${mode.name}-mode-notification`),
+    ]),
+  );
+}
 
 /**
  * Wrapping map to fix annoying type hint errors.
@@ -116,9 +132,6 @@ export function mode<ActionType>(
   mode.triggers.forEach(finalMode.addTrigger);
   mode.manipulators.forEach(finalMode.addMapping);
 
-  // Escape to exit the mode and do nothing else
-  finalMode.addMapping(map("escape"));
-
   const build = () => {
     let triggersRule = rule(
       `${mode.name}: ${mode.description}`,
@@ -137,8 +150,10 @@ export function mode<ActionType>(
     ];
   };
 
-  return {
+  let buildableMode = {
     ...finalMode,
     build,
   };
+  MODES.push(buildableMode);
+  return buildableMode;
 }

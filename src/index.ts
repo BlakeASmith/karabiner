@@ -11,6 +11,7 @@ import {
   NumberKeyValue,
   rule,
   RuleBuilder,
+  toRemoveNotificationMessage,
   toSetVar,
   withCondition,
   withMapper,
@@ -24,6 +25,7 @@ import {
   Binding,
   map,
   withModeEnter,
+  withExitAllModes,
 } from "./lib.ts";
 import { join } from "path";
 
@@ -32,7 +34,7 @@ const isTerminal = ifApp("^.*.iterm2.*$");
 const isNotTerminal = isTerminal.unless();
 
 const ITERM_COMMAND_MODE = "iterm-commands";
-const ITERM_COMMAND_MODE_HINT = "iterm commands!!!!!";
+const ITERM_COMMAND_MODE_HINT = "s: vertical split";
 const itermCommandMode = mode({
   name: ITERM_COMMAND_MODE,
   description: "Iterm2 control commands",
@@ -41,7 +43,7 @@ const itermCommandMode = mode({
   triggers: [mapSimultaneous(["d", "k"])],
   triggerConditions: [isTerminal],
   mappingConditions: [isTerminal],
-  manipulators: [map("t").toNotificationMessage("test", "working!")],
+  manipulators: [map("s").to$(`/bin/zsh -c "~/.local/bin/itermctl vsplit"`)],
 });
 
 const launcherMode = mode({
@@ -61,6 +63,7 @@ const launcherMode = mode({
     map(4).to$(CONFETTI),
     ...["t", 1].flatMap((k) => map(k).toApp("Iterm")),
     map("g").toApp("Google Chrome"),
+    map("q").toApp("Google Gemini"),
     ...["f", "b"].map((k) => map(k).toApp("Firefox")),
     ...["s", 3].map((k) => map(k).toApp("Slack")),
     map("k").toApp("KibanaAWSElectron"),
@@ -88,7 +91,21 @@ const capsLock = rule("CapsLock for lots of things").manipulators([
 
 writeToProfile(
   "Default",
-  [capsLock, ...launcherMode.build(), ...itermCommandMode.build()],
+  [
+    capsLock,
+    ...launcherMode.build(),
+    ...itermCommandMode.build(),
+    // !important this needs to happen after all modes are defined
+    // Any extra re-mapping of Escape key needs to be done here as well
+    rule("escape modes").manipulators([
+      withExitAllModes(map("escape"))
+        .to({ key_code: "escape" })
+        .to([
+          // other escape mappings here
+          toRemoveNotificationMessage("test"),
+        ]),
+    ]),
+  ],
   {
     // This seems to be the magic number for me for most things
     "basic.to_if_held_down_threshold_milliseconds": 110,
