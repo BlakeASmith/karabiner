@@ -33,9 +33,17 @@ All mappings have been verified against official Firefox keyboard shortcuts.
 
 | Vim Key | Action | Raycast Command | Status |
 |---------|-------|----------------|--------|
-| `Shift+T` | Search Browser Tabs | `raycast://extensions/raycast/browser-tabs/search-tabs` | ✅ Added |
-| `Shift+G` | Search Browser History | `raycast://extensions/raycast/browser-history/search-history` | ✅ Added |
-| `Shift+Q` | Search Quicklinks | `raycast://extensions/raycast/quicklinks/search-quicklinks` | ✅ Added |
+| `Shift+T` | Search Browser Tabs | `raycast://extensions/raycast/browser-tabs/search-tabs` | ⚠️ Requires verification |
+| `Shift+G` | Search Browser History | `raycast://extensions/raycast/browser-history/search-history` | ⚠️ Requires verification |
+| `Shift+Q` | Search Quicklinks | `raycast://extensions/raycast/quicklinks/search-quicklinks` | ⚠️ Requires verification |
+
+**Note:** These Raycast URIs follow the standard format `raycast://extensions/{owner}/{extension}/{command}`. To verify or find the correct command names:
+1. Open Raycast
+2. Go to Extensions
+3. Right-click the extension
+4. Select "Copy Command Link" to get the exact URI
+
+If the command names differ, update the constants in `src/index.ts` accordingly.
 
 ## Key Code Mappings
 

@@ -30,6 +30,9 @@ import {
 import { join } from "path";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
+// Raycast browser extensions - format: raycast://extensions/{owner}/{extension}/{command}
+// These are built-in Raycast extensions. If command names differ, update accordingly.
+// To find correct command names: Open Raycast → Extensions → Right-click extension → Copy Command Link
 const RAYCAST_BROWSER_HISTORY = "open -g raycast://extensions/raycast/browser-history/search-history";
 const RAYCAST_BROWSER_BOOKMARKS = "open -g raycast://extensions/raycast/browser-bookmarks/search-bookmarks";
 const RAYCAST_BROWSER_TABS = "open -g raycast://extensions/raycast/browser-tabs/search-tabs";
