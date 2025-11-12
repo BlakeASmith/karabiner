@@ -93,6 +93,7 @@ export type ModeProps<ActionType> = {
   mappingConditions?: ConditionBuilder[];
   triggerConditions?: ConditionBuilder[];
   isOneShotMode?: boolean;
+  oneShotKeys?: BasicManipulatorBuilder[];
 };
 
 export type Mode<ActionType> = {
@@ -113,6 +114,7 @@ export function mode<ActionType>(
     | BasicManipulatorBuilder
     | (Manipulator[] & ManipulatorBuilder)
   )[] = [];
+  const oneShotKeysSet = new Set(mode.oneShotKeys || []);
   let finalMode: Mode<ActionType> = {
     addTrigger: (b: BasicManipulatorBuilder) => {
       let trigger = withModeEnter(mode.name, mode.hint, b)[0];
@@ -120,7 +122,7 @@ export function mode<ActionType>(
       return trigger;
     },
     addMapping: (b: BasicManipulatorBuilder) => {
-      if (mode.isOneShotMode === true) {
+      if (mode.isOneShotMode === true || oneShotKeysSet.has(b)) {
         manipulators.push(withModeExit(mode.name, b));
       } else {
         manipulators.push(b);
