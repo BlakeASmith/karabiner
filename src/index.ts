@@ -36,7 +36,8 @@ const isTerminal = ifApp("^.*.iterm2.*$");
 const isNotTerminal = isTerminal.unless();
 
 const ITERM_COMMAND_MODE = "iterm-commands";
-const ITERM_COMMAND_MODE_HINT = "s: horizontal split | v: vertical split | t: new tab | w: new window | 1-5: tab colors";
+const ITERM_COMMAND_MODE_HINT =
+  "s: horizontal split | v: vertical split | t: new tab | w: new window | 1-5: tab colors";
 const itermCommandMode = mode({
   name: ITERM_COMMAND_MODE,
   description: "Iterm2 control commands",
@@ -69,7 +70,11 @@ const launcherMode = mode({
     "o -> [o]bsidian",
     "m -> E[m]ail",
   ].join(" | "),
-  triggers: [mapSimultaneous(["a", "l"]), mapSimultaneous(["a", ";"])],
+  triggers: [
+    mapSimultaneous(["a", "l"]),
+    mapSimultaneous(["a", ";"]),
+    mapSimultaneous(["]", "\\"]),
+  ],
   manipulators: [],
   oneShotKeys: [
     map(4).to$(CONFETTI),
@@ -80,6 +85,7 @@ const launcherMode = mode({
     ...["s", 3].map((k) => map(k).toApp("Slack")),
     map("k").toApp("KibanaAWSElectron"),
     map("c").toApp("CodeBrowser"),
+    map("n").toApp("Neovide"),
     map("p").toApp("Taskei"),
     map("r").toApp("Postman"),
     map("i").toApp("Cisco Secure Client"),
