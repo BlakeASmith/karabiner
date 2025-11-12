@@ -27,6 +27,7 @@ import {
   withModeEnter,
   withExitAllModes,
 } from "./lib.ts";
+import { firefoxCommandMode } from "./browser.ts";
 import { join } from "path";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
@@ -105,6 +106,7 @@ writeToProfile(
     capsLock,
     ...launcherMode.build(),
     ...itermCommandMode.build(),
+    ...firefoxCommandMode.build(),
     // !important this needs to happen after all modes are defined
     // Any extra re-mapping of Escape key needs to be done here as well
     rule("escape modes").manipulators([
