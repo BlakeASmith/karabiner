@@ -24,9 +24,9 @@ export const windowManagementMode = mode({
   name: WINDOW_MANAGEMENT_MODE,
   description: "Raycast window management commands",
   hint: WINDOW_MANAGEMENT_MODE_HINT,
-  isOneShotMode: true,
   triggers: [mapSimultaneous(["w", "m"])],
-  manipulators: [
+  manipulators: [],
+  oneShotKeys: [
     // Center window
     map("c").to$(RAYCAST_CENTER),
     
