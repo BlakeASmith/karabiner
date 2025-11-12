@@ -41,11 +41,11 @@ const itermCommandMode = mode({
   name: ITERM_COMMAND_MODE,
   description: "Iterm2 control commands",
   hint: ITERM_COMMAND_MODE_HINT,
-  isOneShotMode: true,
   triggers: [mapSimultaneous(["d", "k"])],
   triggerConditions: [isTerminal],
   mappingConditions: [isTerminal],
-  manipulators: [
+  manipulators: [],
+  oneShotKeys: [
     map("s").to$(`/bin/zsh -c "~/.local/bin/itermctl hsplit"`),
     map("v").to$(`/bin/zsh -c "~/.local/bin/itermctl vsplit"`),
     map("t").to$(`/bin/zsh -c "~/.local/bin/itermctl newtab"`),
@@ -61,7 +61,6 @@ const itermCommandMode = mode({
 const launcherMode = mode({
   name: "launcher-mode",
   description: "quickly launch programs",
-  isOneShotMode: true,
   hint: [
     "t/1 -> I[t]erm",
     "f/b -> [f]irefox",
@@ -71,7 +70,8 @@ const launcherMode = mode({
     "m -> E[m]ail",
   ].join(" | "),
   triggers: [mapSimultaneous(["a", "l"]), mapSimultaneous(["a", ";"])],
-  manipulators: [
+  manipulators: [],
+  oneShotKeys: [
     map(4).to$(CONFETTI),
     ...["t", 1].flatMap((k) => map(k).toApp("Iterm")),
     map("g").toApp("Google Chrome"),

@@ -18,11 +18,11 @@ export const firefoxCommandMode = mode({
   name: FIREFOX_COMMAND_MODE,
   description: "Firefox browser controls",
   hint: FIREFOX_COMMAND_MODE_HINT,
-  isOneShotMode: true,
   triggers: [mapSimultaneous(["d", "k"])],
   triggerConditions: [isFirefox],
   mappingConditions: [isFirefox],
-  manipulators: [
+  manipulators: [],
+  oneShotKeys: [
     // Tab management
     map("t").to({ key_code: "t", modifiers: ["left_command"] }), // New tab
     map("d").to({ key_code: "w", modifiers: ["left_command"] }), // Close tab
