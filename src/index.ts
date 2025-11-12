@@ -58,7 +58,7 @@ const itermCommandMode = mode({
 });
 
 const FIREFOX_COMMAND_MODE = "firefox-commands";
-const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | r: reload | R: hard reload | h/l: back/forward | n/p: next/prev tab | 1-9: switch tab | b: bookmarks";
+const FIREFOX_COMMAND_MODE_HINT = "t: new tab | d/x: close tab | u: reopen tab | o: address bar | /: search | f: find | ;/,: find next/prev | n/p: next/prev tab | r: reload | R: hard reload | h/l: back/forward | 1-9: switch tab | b: bookmarks | D: downloads | H: history | W: new window | s: save | y: downloads";
 const firefoxCommandMode = mode({
   name: FIREFOX_COMMAND_MODE,
   description: "Firefox browser controls",
@@ -82,6 +82,11 @@ const firefoxCommandMode = mode({
     map("o").to({ key_code: "l", modifiers: ["left_command"] }), // Address bar
     map("/").to({ key_code: "k", modifiers: ["left_command"] }), // Search
     
+    // Find in page (vim-style)
+    map("f").to({ key_code: "f", modifiers: ["left_command"] }), // Find in page
+    map(";").to({ key_code: "g", modifiers: ["left_command"] }), // Find next
+    map(",").to({ key_code: "g", modifiers: ["left_command", "left_shift"] }), // Find previous
+    
     // Reload
     map("r").to({ key_code: "r", modifiers: ["left_command"] }), // Reload
     map({ key_code: "r", modifiers: { mandatory: ["left_shift"] } }).to({ key_code: "r", modifiers: ["left_command", "left_shift"] }), // Hard reload
@@ -103,6 +108,17 @@ const firefoxCommandMode = mode({
     
     // Bookmarks
     map("b").to({ key_code: "b", modifiers: ["left_command", "left_shift"] }), // Bookmarks sidebar
+    
+    // History & Downloads
+    map({ key_code: "h", modifiers: { mandatory: ["left_shift"] } }).to({ key_code: "h", modifiers: ["left_command", "left_shift"] }), // History sidebar
+    map({ key_code: "d", modifiers: { mandatory: ["left_shift"] } }).to({ key_code: "j", modifiers: ["left_command", "left_shift"] }), // Downloads (D)
+    map("y").to({ key_code: "y", modifiers: ["left_command"] }), // Downloads (alternative)
+    
+    // Window management
+    map({ key_code: "w", modifiers: { mandatory: ["left_shift"] } }).to({ key_code: "n", modifiers: ["left_command"] }), // New window (W)
+    
+    // Save page
+    map("s").to({ key_code: "s", modifiers: ["left_command"] }), // Save page
   ],
 });
 

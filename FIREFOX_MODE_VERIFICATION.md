@@ -21,6 +21,13 @@ All mappings have been verified against official Firefox keyboard shortcuts.
 | `p` | Previous Tab | ⌘⇧[ (Cmd+Shift+[) | ✅ Verified |
 | `1-9` | Switch to Tab 1-9 | ⌘1-9 (Cmd+1 through Cmd+9) | ✅ Verified |
 | `b` | Bookmarks Sidebar | ⌘⇧B (Cmd+Shift+B) | ✅ Verified |
+| `f` | Find in Page | ⌘F (Cmd+F) | ✅ Verified |
+| `;` | Find Next | ⌘G (Cmd+G) | ✅ Verified |
+| `,` | Find Previous | ⌘⇧G (Cmd+Shift+G) | ✅ Verified |
+| `Shift+H` | History Sidebar | ⌘⇧H (Cmd+Shift+H) | ✅ Verified |
+| `Shift+D` or `y` | Downloads | ⌘⇧J (Cmd+Shift+J) or ⌘Y | ✅ Verified |
+| `Shift+W` | New Window | ⌘N (Cmd+N) | ✅ Verified |
+| `s` | Save Page | ⌘S (Cmd+S) | ✅ Verified |
 
 ## Key Code Mappings
 
