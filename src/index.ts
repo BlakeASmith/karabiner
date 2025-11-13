@@ -91,6 +91,7 @@ const launcherMode = mode({
     ...["f", "b"].map((k) => map(k).toApp("Firefox")),
     ...["s", 3].map((k) => map(k).toApp("Slack")),
     map("k").toApp("KibanaAWSElectron"),
+    map("y").toApp("t.corp"),
     map("c").toApp("CodeBrowser"),
     map("n").toApp("Neovide"),
     map("p").toApp("Taskei"),
