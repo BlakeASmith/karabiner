@@ -34,7 +34,7 @@ import {
   withExitAllModes,
 } from "./lib.ts";
 import { firefoxCommandMode } from "./browser.ts";
-import { windowManagementMode } from "./window-management.ts";
+import { windowLayer } from "./window-management.ts";
 import { join } from "path";
 import { escape } from "querystring";
 
@@ -224,24 +224,6 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
     map("f").to$("open -g raycast://script-commands/open-iterm-here"),
     map("m").to$(
       "open -g raycast://extensions/raycast/window-management/almost-maximize",
-    ),
-  ]);
-
-const windowLayer = hyperLayer("w", "window-mode")
-  .leaderMode()
-  .notification(true)
-  .manipulators([
-    map("n").to$(
-      "open -g raycast://extensions/raycast/window-management/almost-maximize",
-    ),
-    map("m").to$(
-      "open -g raycast://extensions/raycast/window-management/maximize",
-    ),
-    map("l").to$(
-      "open -g raycast://extensions/raycast/window-management/right-half",
-    ),
-    map("h").to$(
-      "open -g raycast://extensions/raycast/window-management/left-half",
     ),
   ]);
 
