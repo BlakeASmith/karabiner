@@ -1,5 +1,4 @@
-import { mapSimultaneous } from "karabiner.ts";
-import { mode, map } from "./lib.ts";
+import { createDuoLayer, map } from "./lib.ts";
 
 // Raycast window management extension commands
 // Format: raycast://extensions/{owner}/{extension}/{command}
@@ -20,29 +19,29 @@ const RAYCAST_PREVIOUS_DISPLAY = "open -g raycast://extensions/raycast/window-ma
 const WINDOW_MANAGEMENT_MODE = "window-management";
 const WINDOW_MANAGEMENT_MODE_HINT = "c: center | h: left half | l: right half | k: top half | j: bottom half | m: maximize | r: restore | f: toggle fullscreen | n: next display | p: previous display";
 
-export const windowManagementMode = mode({
-  name: WINDOW_MANAGEMENT_MODE,
-  description: "Raycast window management commands",
-  hint: WINDOW_MANAGEMENT_MODE_HINT,
-  triggers: [mapSimultaneous(["w", "m"])],
-  manipulators: [],
-  oneShotKeys: [
-    // Center window
-    map("c").to$(RAYCAST_CENTER),
-    
-    // Half windows (vim-style directions)
-    map("h").to$(RAYCAST_LEFT_HALF),      // left
-    map("l").to$(RAYCAST_RIGHT_HALF),     // right
-    map("k").to$(RAYCAST_TOP_HALF),       // up
-    map("j").to$(RAYCAST_BOTTOM_HALF),    // down
-    
-    // Window states
-    map("m").to$(RAYCAST_MAXIMIZE),
-    map("r").to$(RAYCAST_RESTORE),        // restore (undo last action)
-    map("f").to$(RAYCAST_TOGGLE_FULLSCREEN),
-    
-    // Display management
-    map("n").to$(RAYCAST_NEXT_DISPLAY),
-    map("p").to$(RAYCAST_PREVIOUS_DISPLAY),
-  ],
-});
+const windowManagementBindings = [
+  // Center window
+  map("c").to$(RAYCAST_CENTER),
+
+  // Half windows (vim-style directions)
+  map("h").to$(RAYCAST_LEFT_HALF), // left
+  map("l").to$(RAYCAST_RIGHT_HALF), // right
+  map("k").to$(RAYCAST_TOP_HALF), // up
+  map("j").to$(RAYCAST_BOTTOM_HALF), // down
+
+  // Window states
+  map("m").to$(RAYCAST_MAXIMIZE),
+  map("r").to$(RAYCAST_RESTORE), // restore (undo last action)
+  map("f").to$(RAYCAST_TOGGLE_FULLSCREEN),
+
+  // Display management
+  map("n").to$(RAYCAST_NEXT_DISPLAY),
+  map("p").to$(RAYCAST_PREVIOUS_DISPLAY),
+];
+
+export const windowManagementLayers = [
+  createDuoLayer("w", "m", WINDOW_MANAGEMENT_MODE)
+    .leaderMode()
+    .notification(WINDOW_MANAGEMENT_MODE_HINT)
+    .manipulators(windowManagementBindings),
+];
