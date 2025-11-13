@@ -25,16 +25,11 @@ import {
 } from "karabiner.ts";
 
 import {
-  mode,
-  ModeProps,
-  BindingMap,
-  Binding,
+  createDuoLayer,
   map,
-  withModeEnter,
   withExitAllModes,
 } from "./lib.ts";
-import { firefoxCommandMode } from "./browser.ts";
-import { windowManagementMode } from "./window-management.ts";
+import { firefoxCommandLayers } from "./browser.ts";
 import { join } from "path";
 import { escape } from "querystring";
 
@@ -45,66 +40,74 @@ const isNotTerminal = isTerminal.unless();
 const ITERM_COMMAND_MODE = "iterm-commands";
 const ITERM_COMMAND_MODE_HINT =
   "s: horizontal split | v: vertical split | t: new tab | w: new window | 1-5: tab colors";
-const itermCommandMode = mode({
-  name: ITERM_COMMAND_MODE,
-  description: "Iterm2 control commands",
-  hint: ITERM_COMMAND_MODE_HINT,
-  triggers: [mapSimultaneous(["d", "k"]), mapSimultaneous(["k", "l"])],
-  triggerConditions: [isTerminal],
-  mappingConditions: [isTerminal],
-  manipulators: [],
-  oneShotKeys: [
-    map("s").to$(`/bin/zsh -c "~/.local/bin/itermctl hsplit"`),
-    map("v").to$(`/bin/zsh -c "~/.local/bin/itermctl vsplit"`),
-    map("t").to$(`/bin/zsh -c "~/.local/bin/itermctl newtab"`),
-    map("w").to$(`/bin/zsh -c "~/.local/bin/itermctl newwindow"`),
-    map(1).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 1"`),
-    map(2).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 2"`),
-    map(3).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 3"`),
-    map(4).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 4"`),
-    map(5).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 5"`),
-  ],
-});
+const itermCommandBindings = [
+  map("s").to$(`/bin/zsh -c "~/.local/bin/itermctl hsplit"`),
+  map("v").to$(`/bin/zsh -c "~/.local/bin/itermctl vsplit"`),
+  map("t").to$(`/bin/zsh -c "~/.local/bin/itermctl newtab"`),
+  map("w").to$(`/bin/zsh -c "~/.local/bin/itermctl newwindow"`),
+  map(1).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 1"`),
+  map(2).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 2"`),
+  map(3).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 3"`),
+  map(4).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 4"`),
+  map(5).to$(`/bin/zsh -c "~/.local/bin/itermctl setcolor 5"`),
+];
 
-const launcherMode = mode({
-  name: "launcher-mode",
-  description: "quickly launch programs",
-  hint: [
-    "t/1 -> I[t]erm",
-    "f/b -> [f]irefox",
-    "s/3 -> [s]lack",
-    "g -> [g]oogle Chrome",
-    "o -> [o]bsidian",
-    "m -> E[m]ail",
-  ].join(" | "),
-  triggers: [
-    mapSimultaneous(["a", "l"]),
-    mapSimultaneous(["a", ";"]),
-    mapSimultaneous(["]", "\\"]),
-  ],
-  manipulators: [],
-  oneShotKeys: [
-    map(4).to$(CONFETTI),
-    ...["t", 1].flatMap((k) => map(k).toApp("Iterm")),
-    map("g").toApp("Google Chrome"),
-    map("q").toApp("Google Gemini"),
-    ...["f", "b"].map((k) => map(k).toApp("Firefox")),
-    ...["s", 3].map((k) => map(k).toApp("Slack")),
-    map("k").toApp("KibanaAWSElectron"),
-    map("c").toApp("CodeBrowser"),
-    map("n").toApp("Neovide"),
-    map("p").toApp("Taskei"),
-    map("r").toApp("Postman"),
-    map("i").toApp("Cisco Secure Client"),
-    map("o").toApp("Obsidian"),
-    map("m").toApp("Email"),
-    map("0").toApp("Karabiner-EventViewer"),
-    map("\\").toApp("Karabiner-Elements"),
-    map({ key_code: "k", modifiers: { mandatory: ["left_shift"] } }).toApp(
-      "Kiro",
-    ),
-  ],
-});
+const itermCommandLayers = [
+  createDuoLayer("d", "k", ITERM_COMMAND_MODE)
+    .leaderMode()
+    .notification(ITERM_COMMAND_MODE_HINT)
+    .condition(isTerminal)
+    .manipulators(itermCommandBindings),
+  createDuoLayer("k", "l", ITERM_COMMAND_MODE)
+    .leaderMode({ escape: [] })
+    .notification(false)
+    .condition(isTerminal),
+];
+
+const LAUNCHER_MODE = "launcher-mode";
+const LAUNCHER_MODE_HINT = [
+  "t/1 -> I[t]erm",
+  "f/b -> [f]irefox",
+  "s/3 -> [s]lack",
+  "g -> [g]oogle Chrome",
+  "o -> [o]bsidian",
+  "m -> E[m]ail",
+].join(" | ");
+
+const launcherBindings = [
+  map(4).to$(CONFETTI),
+  ...["t", 1].flatMap((k) => map(k).toApp("Iterm")),
+  map("g").toApp("Google Chrome"),
+  map("q").toApp("Google Gemini"),
+  ...["f", "b"].map((k) => map(k).toApp("Firefox")),
+  ...["s", 3].map((k) => map(k).toApp("Slack")),
+  map("k").toApp("KibanaAWSElectron"),
+  map("c").toApp("CodeBrowser"),
+  map("n").toApp("Neovide"),
+  map("p").toApp("Taskei"),
+  map("r").toApp("Postman"),
+  map("i").toApp("Cisco Secure Client"),
+  map("o").toApp("Obsidian"),
+  map("m").toApp("Email"),
+  map("0").toApp("Karabiner-EventViewer"),
+  map("\\").toApp("Karabiner-Elements"),
+  map({ key_code: "k", modifiers: { mandatory: ["left_shift"] } }).toApp(
+    "Kiro",
+  ),
+];
+
+const launcherLayers = [
+  createDuoLayer("a", "l", LAUNCHER_MODE)
+    .leaderMode()
+    .notification(LAUNCHER_MODE_HINT)
+    .manipulators(launcherBindings),
+  createDuoLayer("a", ";", LAUNCHER_MODE)
+    .leaderMode({ escape: [] })
+    .notification(false),
+  createDuoLayer("]", "\\", LAUNCHER_MODE)
+    .leaderMode({ escape: [] })
+    .notification(false),
+];
 
 type HomeRowKeyOptions = {
   toIfHeldDown: ToEvent[];
@@ -253,10 +256,10 @@ writeToProfile(
     raycastLayer,
     t_sublayer,
     windowLayer,
-    ...launcherMode.build(),
-    ...itermCommandMode.build(),
-    ...firefoxCommandMode.build(),
-    // ...windowManagementMode.build(),
+    ...launcherLayers,
+    ...itermCommandLayers,
+    ...firefoxCommandLayers,
+    // ...windowManagementLayers,
     // !important this needs to happen after all modes are defined
     // Any extra re-mapping of Escape key needs to be done here as well
     rule("escape modes").manipulators([
