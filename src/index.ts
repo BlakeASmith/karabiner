@@ -37,6 +37,7 @@ import { firefoxCommandMode } from "./browser.ts";
 import { windowLayer } from "./window-management.ts";
 import { join } from "path";
 import { escape } from "querystring";
+import { statefulAppLayer } from "./apps.ts";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
 const isTerminal = ifApp("^.*.iterm2.*$");
@@ -66,6 +67,8 @@ const itermCommandMode = mode({
   ],
 });
 
+// IDEA: use script to store state of what was the last app opened so I can have keybinds to go back and forth
+
 const launcherMode = mode({
   name: "launcher-mode",
   description: "quickly launch programs",
@@ -80,6 +83,8 @@ const launcherMode = mode({
   triggers: [
     mapSimultaneous(["a", "l"]),
     mapSimultaneous(["a", ";"]),
+    mapSimultaneous(["s", "l"]),
+    mapSimultaneous(["s", ";"]),
     mapSimultaneous(["]", "\\"]),
   ],
   manipulators: [],
@@ -99,6 +104,7 @@ const launcherMode = mode({
     map("i").toApp("Cisco Secure Client"),
     map("o").toApp("Obsidian"),
     map("m").toApp("Email"),
+    map("d").toApp("Bazecor"),
     map("0").toApp("Karabiner-EventViewer"),
     map("\\").toApp("Karabiner-Elements"),
     map({ key_code: "k", modifiers: { mandatory: ["left_shift"] } }).toApp(
@@ -231,6 +237,7 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
 writeToProfile(
   "Default",
   [
+    statefulAppLayer,
     ..._homeRow,
     capsLock,
     raycastLayer,
