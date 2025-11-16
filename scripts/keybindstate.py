@@ -22,6 +22,35 @@ else:
     windowindex = state.get("windowindex", 1)
 
 
+def get_current_app() -> str:
+    """Get the name of the currently focused application."""
+    cmd = "osascript -e 'tell application \"System Events\" to get name of first application process whose frontmost is true'"
+    result = os.popen(cmd).read().strip()
+    return result
+
+
+def add_app_to_stack(app: str, position: int = 0) -> int:
+    """
+    Add an app to the appstack at a specific position if it's not already present.
+    Returns the index of the app in the stack after insertion.
+
+    Args:
+        app: The app name to add
+        position: The index where to insert the app (default: 0)
+
+    Returns:
+        The index of the app in the stack
+    """
+    assert isinstance(appstack, list)
+    if app in appstack:
+        # App already exists, return its current index
+        return appstack.index(app)
+    else:
+        # Insert at the specified position
+        appstack.insert(position, app)
+        return position
+
+
 def focus_window(app: str, win_number: int):
     cmd = f"""
 osascript -e 'tell application "System Events" to tell process "{app}"' \
@@ -50,6 +79,9 @@ def parse_args() -> Namespace:
     _ = index.add_argument("n", type=int)
     remove = subparsers.add_parser("remove")
     _ = remove.add_argument("app")
+    add_current = subparsers.add_parser("add-current")
+    add_current.add_argument("position", type=int, nargs="?", default=0, help="Position in stack to insert app (default: 0)")
+    remove_current = subparsers.add_parser("remove-current")
     win_next = subparsers.add_parser("win-next")
     win_prev = subparsers.add_parser("win-prev")
 
@@ -114,6 +146,24 @@ if __name__ == "__main__":
             appstack.remove(args.app)
             if cur in appstack:
                 appindex = appstack.index(cur)
+        elif args.cmd == "add-current":
+            current_app = get_current_app()
+            position = max(0, args.position)
+            appindex = add_app_to_stack(current_app, position)
+        elif args.cmd == "remove-current":
+            current_app = get_current_app()
+            if current_app in appstack:
+                cur = appstack[appindex] if appstack else None
+                appstack.remove(current_app)
+                # Adjust appindex if needed
+                if cur == current_app:
+                    # The removed app was the current one, adjust index
+                    if appstack:
+                        appindex = min(appindex, len(appstack) - 1)
+                    else:
+                        appindex = 0
+                elif cur in appstack:
+                    appindex = appstack.index(cur)
         elif args.cmd == "win-next":
             windowindex += 1
             cur = appstack[appindex]
@@ -126,6 +176,7 @@ if __name__ == "__main__":
 
     finally:
         # always persist the state
+        state["appstack"] = appstack
         state["appindex"] = appindex
         state["windowindex"] = windowindex
         STATE_PATH.write_text(json.dumps(state))
