@@ -234,6 +234,19 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
     ),
   ]);
 
+const bracketLayer = duoLayer("a", "s")
+  .notification(true)
+  .manipulators([
+    map("j").to({ key_code: "open_bracket", modifiers: ["left_shift"] }),
+    map("k").to({ key_code: "close_bracket", modifiers: ["left_shift"] }),
+    map("l").to({ key_code: "open_bracket" }),
+    map(";").to({ key_code: "close_bracket" }),
+    map("u").to({ key_code: "9", modifiers: ["left_shift"] }),
+    map("i").to({ key_code: "0", modifiers: ["left_shift"] }),
+    map("g").to({ key_code: "comma", modifiers: ["left_shift"] }),
+    map("h").to({ key_code: "period", modifiers: ["left_shift"] }),
+  ]);
+
 writeToProfile(
   "Default",
   [
@@ -241,6 +254,7 @@ writeToProfile(
     ..._homeRow,
     capsLock,
     raycastLayer,
+    bracketLayer,
     t_sublayer,
     windowLayer,
     ...launcherMode.build(),
