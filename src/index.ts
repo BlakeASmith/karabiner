@@ -38,6 +38,7 @@ import { windowLayer } from "./window-management.ts";
 import { join } from "path";
 import { escape } from "querystring";
 import { dynamicNavigation, navigationOnTab, stickyNavigationOnIO } from "./apps.ts";
+import { rightHandSymbolLayer } from "./symbol-layer.ts";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
 const isTerminal = ifApp("^.*.iterm2.*$");
@@ -238,6 +239,7 @@ writeToProfile(
   "Default",
   [
     ...dynamicNavigation,
+    rightHandSymbolLayer,
     ..._homeRow,
     capsLock,
     raycastLayer,
