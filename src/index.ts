@@ -234,6 +234,31 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
     ),
   ]);
 
+// Symbol layer for easy bracket access
+// Triggered by holding 'a' (left side), maps right side to brackets
+const symbolLayer = simlayer("a", "symbol-layer").manipulators([
+    // Brackets on home row and adjacent keys
+    map("j").to("open_bracket", "left_shift"),    // j -> {
+    map("k").to("close_bracket", "left_shift"),   // k -> }
+    map("l").to("open_bracket"),                  // l -> [
+    map(";").to("close_bracket"),                 // ; -> ]
+    map("u").to("9", "left_shift"),               // u -> (
+    map("i").to("0", "left_shift"),               // i -> )
+    map("h").to("comma", "left_shift"),           // h -> <
+    map("g").to("period", "left_shift"),          // g -> >
+    
+    // Additional useful symbols on right side
+    map("y").to("7", "left_shift"),               // y -> &
+    map("o").to("equal_sign", "left_shift"),      // o -> +
+    map("p").to("hyphen", "left_shift"),          // p -> _
+    map("n").to("grave_accent_and_tilde"),        // n -> `
+    map("m").to("grave_accent_and_tilde", "left_shift"),  // m -> ~
+    map(",").to("slash"),                         // , -> /
+    map(".").to("backslash", "left_shift"),       // . -> |
+    map("/").to("backslash"),                     // / -> \
+    map("'").to("quote", "left_shift"),           // ' -> "
+  ]);
+
 writeToProfile(
   "Default",
   [
@@ -241,6 +266,7 @@ writeToProfile(
     ..._homeRow,
     capsLock,
     raycastLayer,
+    symbolLayer,
     t_sublayer,
     windowLayer,
     ...launcherMode.build(),
