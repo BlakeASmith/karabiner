@@ -235,67 +235,49 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
   ]);
 
 // Symbols and Arrows Layer
-const symbolsAndArrowsLayer = mode({
-  name: "symbols-arrows",
-  description: "Programming symbols and arrow keys on hjkl",
-  hint: [
-    "hjkl -> arrows",
-    "ui -> [] {}",
-    "nm -> () <>",
-    "y -> _",
-    "p -> |",
-    "o -> \\",
-    "; -> =",
-  ].join(" | "),
-  triggers: [
-    mapSimultaneous(["f", "j"]),
-    mapSimultaneous(["d", "k"]),
-  ],
-  manipulators: [],
-  oneShotKeys: [
-    // Arrow keys on hjkl
-    map("h").to("left_arrow"),
-    map("j").to("down_arrow"),
-    map("k").to("up_arrow"),
-    map("l").to("right_arrow"),
-    
-    // Brackets and braces
-    map("u").to("open_bracket"), // [
-    map("i").to("close_bracket"), // ]
-    map({ key_code: "u", modifiers: { mandatory: ["left_shift"] } }).to("open_bracket", "left_shift"), // {
-    map({ key_code: "i", modifiers: { mandatory: ["left_shift"] } }).to("close_bracket", "left_shift"), // }
-    
-    // Parentheses and angle brackets
-    map("n").to("9", "left_shift"), // (
-    map("m").to("0", "left_shift"), // )
-    map({ key_code: "n", modifiers: { mandatory: ["left_shift"] } }).to("comma", "left_shift"), // <
-    map({ key_code: "m", modifiers: { mandatory: ["left_shift"] } }).to("period", "left_shift"), // >
-    
-    // Common symbols
-    map("y").to("hyphen", "left_shift"), // underscore _
-    map("p").to("backslash", "left_shift"), // pipe |
-    map("o").to("backslash"), // backslash \
-    map(";").to("equal_sign"), // equals =
-    map({ key_code: ";", modifiers: { mandatory: ["left_shift"] } }).to("equal_sign", "left_shift"), // plus +
-    
-    // Additional useful symbols
-    map("'").to("grave_accent_and_tilde"), // backtick `
-    map({ key_code: "'", modifiers: { mandatory: ["left_shift"] } }).to("grave_accent_and_tilde", "left_shift"), // tilde ~
-    map(",").to("hyphen"), // dash/hyphen -
-    map(".").to("equal_sign", "left_shift"), // plus +
-    map("/").to("backslash", "left_shift"), // pipe |
-    
-    // Numbers for quick access (shifted symbols)
-    map("1").to("1", "left_shift"), // !
-    map("2").to("2", "left_shift"), // @
-    map("3").to("3", "left_shift"), // #
-    map("4").to("4", "left_shift"), // $
-    map("5").to("5", "left_shift"), // %
-    map("6").to("6", "left_shift"), // ^
-    map("7").to("7", "left_shift"), // &
-    map("8").to("8", "left_shift"), // *
-  ],
-});
+const symbolsAndArrowsLayer = simlayer("f", "j").manipulators([
+  // Arrow keys on hjkl
+  map("h").to("left_arrow"),
+  map("j").to("down_arrow"),
+  map("k").to("up_arrow"),
+  map("l").to("right_arrow"),
+  
+  // Brackets and braces
+  map("u").to("open_bracket"), // [
+  map("i").to("close_bracket"), // ]
+  map({ key_code: "u", modifiers: { mandatory: ["left_shift"] } }).to("open_bracket", "left_shift"), // {
+  map({ key_code: "i", modifiers: { mandatory: ["left_shift"] } }).to("close_bracket", "left_shift"), // }
+  
+  // Parentheses and angle brackets
+  map("n").to("9", "left_shift"), // (
+  map("m").to("0", "left_shift"), // )
+  map({ key_code: "n", modifiers: { mandatory: ["left_shift"] } }).to("comma", "left_shift"), // <
+  map({ key_code: "m", modifiers: { mandatory: ["left_shift"] } }).to("period", "left_shift"), // >
+  
+  // Common symbols
+  map("y").to("hyphen", "left_shift"), // underscore _
+  map("p").to("backslash", "left_shift"), // pipe |
+  map("o").to("backslash"), // backslash \
+  map(";").to("equal_sign"), // equals =
+  map({ key_code: ";", modifiers: { mandatory: ["left_shift"] } }).to("equal_sign", "left_shift"), // plus +
+  
+  // Additional useful symbols
+  map("'").to("grave_accent_and_tilde"), // backtick `
+  map({ key_code: "'", modifiers: { mandatory: ["left_shift"] } }).to("grave_accent_and_tilde", "left_shift"), // tilde ~
+  map(",").to("hyphen"), // dash/hyphen -
+  map(".").to("equal_sign", "left_shift"), // plus +
+  map("/").to("backslash", "left_shift"), // pipe |
+  
+  // Numbers for quick access (shifted symbols)
+  map("1").to("1", "left_shift"), // !
+  map("2").to("2", "left_shift"), // @
+  map("3").to("3", "left_shift"), // #
+  map("4").to("4", "left_shift"), // $
+  map("5").to("5", "left_shift"), // %
+  map("6").to("6", "left_shift"), // ^
+  map("7").to("7", "left_shift"), // &
+  map("8").to("8", "left_shift"), // *
+]);
 
 writeToProfile(
   "Default",
@@ -306,10 +288,10 @@ writeToProfile(
     raycastLayer,
     t_sublayer,
     windowLayer,
+    symbolsAndArrowsLayer,
     ...launcherMode.build(),
     ...itermCommandMode.build(),
     ...firefoxCommandMode.build(),
-    ...symbolsAndArrowsLayer.build(),
     // ...windowManagementMode.build(),
     // !important this needs to happen after all modes are defined
     // Any extra re-mapping of Escape key needs to be done here as well
