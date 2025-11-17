@@ -1,4 +1,4 @@
-import { duoLayer } from "karabiner.ts";
+import { duoLayer, withMapper } from "karabiner.ts";
 import { map } from "./lib.ts";
 
 const SYMBOLS_MODE_HINT =
@@ -6,10 +6,12 @@ const SYMBOLS_MODE_HINT =
 
 const symbolsManipulators = [
   // Arrow keys on hjkl
-  map("h").to({ key_code: "left_arrow" }),
-  map("j").to({ key_code: "down_arrow" }),
-  map("k").to({ key_code: "up_arrow" }),
-  map("l").to({ key_code: "right_arrow" }),
+  withMapper({
+    h: "left_arrow",
+    j: "down_arrow",
+    k: "up_arrow",
+    l: "right_arrow",
+  })((key, arrowKey) => map(key).to({ key_code: arrowKey })),
 
   // Common brackets and parentheses with shift+hjkl
   map({ key_code: "h", modifiers: { mandatory: ["left_shift"] } }).to({
@@ -30,10 +32,12 @@ const symbolsManipulators = [
   }), // >
 
   // Square brackets and parentheses
-  map("u").to({ key_code: "open_bracket" }), // [
-  map("i").to({ key_code: "close_bracket" }), // ]
-  map("o").to({ key_code: "open_bracket", modifiers: ["left_shift"] }), // (
-  map("p").to({ key_code: "close_bracket", modifiers: ["left_shift"] }), // )
+  withMapper({
+    u: { key_code: "open_bracket" },
+    i: { key_code: "close_bracket" },
+    o: { key_code: "open_bracket", modifiers: ["left_shift"] },
+    p: { key_code: "close_bracket", modifiers: ["left_shift"] },
+  })((key, toEvent) => map(key).to(toEvent)),
 
   // Math operators
   map("y").to({ key_code: "hyphen" }), // -
@@ -43,26 +47,32 @@ const symbolsManipulators = [
     modifiers: ["left_shift"],
   }), // +
 
-  // Underscore and other symbols
-  map("f").to({ key_code: "hyphen", modifiers: ["left_shift"] }), // _
-  map("g").to({ key_code: "hyphen", modifiers: ["left_shift"] }), // _ (alternative)
+  // Underscore
+  withMapper({
+    f: { key_code: "hyphen", modifiers: ["left_shift"] },
+    g: { key_code: "hyphen", modifiers: ["left_shift"] },
+  })((key, toEvent) => map(key).to(toEvent)),
 
   // Punctuation
-  map("d").to({ key_code: "period" }), // .
-  map("s").to({ key_code: "comma" }), // ,
-  map("a").to({ key_code: "semicolon" }), // ;
-  map(";").to({ key_code: "semicolon", modifiers: ["left_shift"] }), // :
+  withMapper({
+    d: { key_code: "period" },
+    s: { key_code: "comma" },
+    a: { key_code: "semicolon" },
+    ";": { key_code: "semicolon", modifiers: ["left_shift"] },
+  })((key, toEvent) => map(key).to(toEvent)),
 
   // Special characters
-  map("q").to({ key_code: "1", modifiers: ["left_shift"] }), // !
-  map("w").to({ key_code: "2", modifiers: ["left_shift"] }), // @
-  map("e").to({ key_code: "3", modifiers: ["left_shift"] }), // #
-  map("r").to({ key_code: "4", modifiers: ["left_shift"] }), // $
-  map("t").to({ key_code: "8", modifiers: ["left_shift"] }), // *
-  map("z").to({ key_code: "backslash", modifiers: ["left_shift"] }), // |
-  map("x").to({ key_code: "7", modifiers: ["left_shift"] }), // &
-  map("c").to({ key_code: "5", modifiers: ["left_shift"] }), // %
-  map("v").to({ key_code: "backslash" }), // \
+  withMapper({
+    q: { key_code: "1", modifiers: ["left_shift"] },
+    w: { key_code: "2", modifiers: ["left_shift"] },
+    e: { key_code: "3", modifiers: ["left_shift"] },
+    r: { key_code: "4", modifiers: ["left_shift"] },
+    t: { key_code: "8", modifiers: ["left_shift"] },
+    z: { key_code: "backslash", modifiers: ["left_shift"] },
+    x: { key_code: "7", modifiers: ["left_shift"] },
+    c: { key_code: "5", modifiers: ["left_shift"] },
+    v: { key_code: "backslash" },
+  })((key, toEvent) => map(key).to(toEvent)),
 ];
 
 // Create three duoLayers for hj, jk, and kl triggers
