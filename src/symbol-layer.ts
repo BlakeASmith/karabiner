@@ -1,4 +1,4 @@
-import { hyperLayer, ToEvent } from "karabiner.ts";
+import { hyperLayer, ToEvent, withMapper } from "karabiner.ts";
 import { map } from "./lib.ts";
 
 const shift = (key_code: string): ToEvent => ({
@@ -40,11 +40,11 @@ const symbolMappings: Record<string, ToEvent> = {
   s: shift("semicolon"),
 };
 
-const symbolManipulators = Object.entries(symbolMappings).map(([from, toEvent]) =>
+const symbolManipulators = withMapper(symbolMappings)((from, toEvent) =>
   map(from).to(toEvent),
 );
 
 export const symbolsLayer = hyperLayer("s", "symbols-layer")
   .leaderMode()
   .notification(SYMBOL_LAYER_HINT)
-  .manipulators(symbolManipulators);
+  .manipulators([symbolManipulators]);
