@@ -35,6 +35,7 @@ import {
 } from "./lib.ts";
 import { firefoxCommandMode } from "./browser.ts";
 import { windowLayer } from "./window-management.ts";
+import { symbolsLayer } from "./symbol-layer.ts";
 import { join } from "path";
 import { escape } from "querystring";
 import { dynamicNavigation, navigationOnTab, stickyNavigationOnIO } from "./apps.ts";
@@ -243,6 +244,7 @@ writeToProfile(
     raycastLayer,
     t_sublayer,
     windowLayer,
+    symbolsLayer,
     ...launcherMode.build(),
     ...itermCommandMode.build(),
     ...firefoxCommandMode.build(),
