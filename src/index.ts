@@ -35,6 +35,7 @@ import {
 } from "./lib.ts";
 import { firefoxCommandMode } from "./browser.ts";
 import { windowLayer } from "./window-management.ts";
+import { hjklLayer } from "./hjkl-layer.ts";
 import { join } from "path";
 import { escape } from "querystring";
 import { dynamicNavigation, navigationOnTab, stickyNavigationOnIO } from "./apps.ts";
@@ -241,6 +242,7 @@ writeToProfile(
     ..._homeRow,
     capsLock,
     raycastLayer,
+    hjklLayer,
     t_sublayer,
     windowLayer,
     ...launcherMode.build(),
