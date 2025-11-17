@@ -234,6 +234,27 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
     ),
   ]);
 
+const symbolLayer = duoLayer("q", "w")
+  .notification(true)
+  .leaderMode({
+    sticky: true,
+    escape: ["escape", "caps_lock", "return_or_enter"]
+  })
+  .manipulators([
+    // jk for {}
+    map("j").to({ key_code: "open_bracket", modifiers: ["left_shift"] }), // {
+    map("k").to({ key_code: "close_bracket", modifiers: ["left_shift"] }), // }
+    // l; for []
+    map("l").to({ key_code: "open_bracket" }), // [
+    map(";").to({ key_code: "close_bracket" }), // ]
+    // GH for <>
+    map("g").to({ key_code: "comma", modifiers: ["left_shift"] }), // <
+    map("h").to({ key_code: "period", modifiers: ["left_shift"] }), // >
+    // ui for ()
+    map("u").to({ key_code: "9", modifiers: ["left_shift"] }), // (
+    map("i").to({ key_code: "0", modifiers: ["left_shift"] }), // )
+  ]);
+
 writeToProfile(
   "Default",
   [
@@ -241,6 +262,7 @@ writeToProfile(
     ..._homeRow,
     capsLock,
     raycastLayer,
+    symbolLayer,
     t_sublayer,
     windowLayer,
     ...launcherMode.build(),
