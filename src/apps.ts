@@ -73,6 +73,16 @@ function init() {
 // init()
 
 
+const NAVIGATION_HINT = [
+        "h/l -> switch apps",
+        "j/k -> cycle windows",
+        "a -> add current",
+        "r -> remove current",
+        "= -> assign mode",
+        "# -> jump/set index",
+        "s -> Raycast switcher",
+].join(" | ")
+
 const navigationModeKeys = [
         map("j").toIfAlone(CMD_GRAVE),
         map("k").toIfAlone(CMD_TILDI),
@@ -103,12 +113,13 @@ const navigationModeKeys = [
 
 
 export const navigationOnTab = layer("tab")
+    .notification(NAVIGATION_HINT)
     .manipulators([
         ...navigationModeKeys
     ])
 
 export const stickyNavigationOnIO = duoLayer("i", "o")
-    .notification(true)
+    .notification(NAVIGATION_HINT)
     .leaderMode({
         sticky: true,
         escape: ["escape", "caps_lock", "return_or_enter", "tab"]
@@ -118,7 +129,7 @@ export const stickyNavigationOnIO = duoLayer("i", "o")
     ])
 
 export const leaderNavigationOnWe = duoLayer("w", "e")
-    .notification(true)
+    .notification(NAVIGATION_HINT)
     .leaderMode()
     .manipulators([
         ...navigationModeKeys
