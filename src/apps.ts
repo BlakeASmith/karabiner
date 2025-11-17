@@ -1,5 +1,6 @@
-import { duoLayer, rule, ToEvent, withMapper, toHyper, FromEvent, FromKeyCode, layer, toSetVar, ifVar } from "karabiner.ts";
+import { duoLayer, rule, ToEvent, withMapper, toHyper, FromEvent, FromKeyCode, layer, toSetVar, ifVar, withCondition, toRemoveNotificationMessage, toNotificationMessage } from "karabiner.ts";
 import { map } from "./lib";
+import { execShellCommand } from "./util";
 
 
 export const hyper = (key: FromKeyCode): FromEvent => ({key_code: key, modifiers: { mandatory: ["left_control", "left_option", "left_shift", "left_command"] }})
@@ -36,72 +37,96 @@ export const toPrevApp = (): ToEvent =>({
 
 export const toAddApp = (): ToEvent => toKeybindStateCmd(`add-current`)
 export const toRemoveApp = (): ToEvent => toKeybindStateCmd(`remove-current`)
+export const toAppIndex = (k: number): ToEvent => toKeybindStateCmd(`index ${k}`)
+export const toSetIndex = (k: number): ToEvent => toKeybindStateCmd(`move ${k}`)
 
-// Stateful app switching
-export const statefulAppLayer = duoLayer("w", "e", "apps-mode")
-    .leaderMode(true)
-    .notification(true)
+export const toSetMapping = (key: string): ToEvent => ({
+    shell_command: `/bin/zsh -c "~/.local/bin/keybindstate set-mapping '${key}'"`
+})
+
+export const toOpenMapping = (key: string): ToEvent => ({
+    shell_command: `/bin/zsh -c "~/.local/bin/keybindstate open-mapping '${key}'"`
+})
+
+export const toGetMapping = (key: string): ToEvent => ({
+    shell_command: `/bin/zsh -c "~/.local/bin/keybindstate get-mapping '${key}'"`
+})
+
+const ASSIGNABLE_KEYS = [..."qwetyuiopfg;'zxcvbnm,./-[]".split(""), "\\"]
+const NUMBERS = [1,2,3,4,5,6,7,8,9,0]
+
+// Initialize default bindings
+function init() {
+    Object.entries({
+        t: "iTerm2",
+        g: "Google Chrome",
+        f: "Firefox",
+        b: "Firefox",
+        q: "Google Gemini",
+        v: "Neovide",
+        o: "Obsidian",
+        d: "Bazecor",
+        m: "Email",
+    }).forEach(([k, v]) => execShellCommand(`/bin/zsh -c "~/.local/bin/keybindstate set-mapping ${k} '${v}'"`))
+}
+
+// init()
+
+
+const navigationModeKeys = [
+        map("j").toIfAlone(CMD_GRAVE),
+        map("k").toIfAlone(CMD_TILDI),
+        map("l").toIfAlone(toNextApp()),
+        map("h").toIfAlone(toPrevApp()),
+        map("a").toIfAlone(toAddApp()),
+        map("r").toIfAlone(toRemoveApp()),
+        // Dynamically assign keys to apps
+        map("=").toVar("assign-mode", 1).toNotificationMessage("assign-mode", "Press key to assign"),
+        // Assign the next key pressed
+        withCondition(ifVar("assign-mode", 1))([
+            withMapper(ASSIGNABLE_KEYS)((k, _) => map(k).toIfAlone([toSetMapping(k), toRemoveNotificationMessage("assign-mode"), toSetVar("assign-mode", 0)])),
+        ]),
+        // If not in assign mode, then the key opens the app it is currently assigned to
+        withCondition(ifVar("assign-mode", 0))([
+            withMapper(ASSIGNABLE_KEYS)((k, _) => map(k).toIfAlone(toOpenMapping(k))),
+        ]),
+        // Number keys go to positions in the stack
+        withCondition(ifVar("assign-mode", 0))([
+            withMapper(NUMBERS)(k => map(k).toIfAlone(toAppIndex(k))),
+        ]),
+        // Assigning number keys changes ordering
+        withCondition(ifVar("assign-mode", 1))([
+            withMapper(NUMBERS)(k => map(k).toIfAlone([toSetIndex(k), toRemoveNotificationMessage("assign-mode"), toSetVar("assign-mode", 0)]))
+        ]),
+        map("s").to$(`open -g raycast://extensions/raycast/navigation/switch-windows`),
+]
+
+
+export const navigationOnTab = layer("tab")
     .manipulators([
-        withMapper({
-            t: "Iterm",
-            g: "Google Chrome",
-            f: "Firefox",
-            b: "Firefox",
-            q: "Google Gemini",
-            v: "Neovide",
-            o: "Obsidian",
-            d: "Bazecor",
-            m: "Email",
-        })((k, v) => map(k).to$(`/bin/zsh -c "~/.local/bin/keybindstate switch '${v}'"`)),
-        withMapper({
-            n: "next",
-            p: "prev",
-            l: "last",
-            0: "first",
-            1: "index 1",
-            2: "index 2",
-            3: "index 3",
-            4: "index 4",
-            5: "index 5",
-        })((k, v) => map(k).to$(`/bin/zsh -c "~/.local/bin/keybindstate ${v}"`)),
-        // TODO: Need a way to change the order
-        // One way would be to just edit the config file
-        // Should also be able to add the currently open app even if it wasn't 
-        // opened with a keybinding 
-        // CMD + ` to cycle windows of the current app
-        map("j").toIfAlone({
-            "key_code": "grave_accent_and_tilde",
-            "modifiers": ["left_command"]
-        }),
-        // CMD + ~ to cycle the other way
-        map("k").toIfAlone({
-            "key_code": "grave_accent_and_tilde",
-            "modifiers": ["left_shift", "left_command"]
-        })
+        ...navigationModeKeys
+    ])
+
+export const stickyNavigationOnIO = duoLayer("i", "o")
+    .notification(true)
+    .leaderMode({
+        sticky: true,
+        escape: ["escape", "caps_lock", "return_or_enter", "tab"]
+    })
+    .manipulators([
+        ...navigationModeKeys
+    ])
+
+export const leaderNavigationOnWe = duoLayer("w", "e")
+    .notification(true)
+    .leaderMode()
+    .manipulators([
+        ...navigationModeKeys
     ])
 
 
-    const navigationModeKeys = [
-            map("j").toIfAlone(CMD_GRAVE),
-            map("k").toIfAlone(CMD_TILDI),
-            map("l").toIfAlone(toNextApp()),
-            map("h").toIfAlone(toPrevApp()),
-            map("a").toIfAlone(toAddApp()),
-            map("r").toIfAlone(toAddApp()),
-    ]
-
-
-    export const navigationOnTab = layer("tab")
-        .manipulators([
-            ...navigationModeKeys
-        ])
-
-    export const stickyNavigationOnIO = duoLayer("i", "o")
-        .notification(true)
-        .leaderMode({
-            sticky: true,
-            escape: ["escape", "caps_lock", "return_or_enter", "tab"]
-        })
-        .manipulators([
-            ...navigationModeKeys
-        ])
+export const dynamicNavigation = [
+    navigationOnTab,
+    stickyNavigationOnIO,
+    leaderNavigationOnWe
+]

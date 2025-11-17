@@ -37,7 +37,7 @@ import { firefoxCommandMode } from "./browser.ts";
 import { windowLayer } from "./window-management.ts";
 import { join } from "path";
 import { escape } from "querystring";
-import { statefulAppLayer, navigationOnTab, stickyNavigationOnIO } from "./apps.ts";
+import { dynamicNavigation, navigationOnTab, stickyNavigationOnIO } from "./apps.ts";
 
 const CONFETTI = "open -g raycast://extensions/raycast/raycast/confetti";
 const isTerminal = ifApp("^.*.iterm2.*$");
@@ -237,9 +237,7 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
 writeToProfile(
   "Default",
   [
-    statefulAppLayer,
-    navigationOnTab,
-    stickyNavigationOnIO,
+    ...dynamicNavigation,
     ..._homeRow,
     capsLock,
     raycastLayer,
