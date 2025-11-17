@@ -103,12 +103,13 @@ const navigationModeKeys = [
 
 
 export const navigationOnTab = layer("tab")
+    .notification("j/k: prev/next window | h/l: prev/next app | a: add app | r: remove app | =: assign mode | 1-9: go to position | s: switch windows")
     .manipulators([
         ...navigationModeKeys
     ])
 
 export const stickyNavigationOnIO = duoLayer("i", "o")
-    .notification(true)
+    .notification("j/k: prev/next window | h/l: prev/next app | a: add app | r: remove app | =: assign mode | 1-9: go to position | s: switch windows")
     .leaderMode({
         sticky: true,
         escape: ["escape", "caps_lock", "return_or_enter", "tab"]
@@ -118,7 +119,7 @@ export const stickyNavigationOnIO = duoLayer("i", "o")
     ])
 
 export const leaderNavigationOnWe = duoLayer("w", "e")
-    .notification(true)
+    .notification("j/k: prev/next window | h/l: prev/next app | a: add app | r: remove app | =: assign mode | 1-9: go to position | s: switch windows")
     .leaderMode()
     .manipulators([
         ...navigationModeKeys
