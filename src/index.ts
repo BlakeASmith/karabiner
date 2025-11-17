@@ -237,46 +237,82 @@ const raycastLayer = hyperLayer("r", "raycast-mode")
 // Symbols and Arrows Layer
 const symbolsAndArrowsLayer = simlayer("f", "j").manipulators([
   // Arrow keys on hjkl
-  map("h").to("left_arrow"),
-  map("j").to("down_arrow"),
-  map("k").to("up_arrow"),
-  map("l").to("right_arrow"),
+  withMapper({
+    h: "left_arrow",
+    j: "down_arrow",
+    k: "up_arrow",
+    l: "right_arrow",
+  })((key, value) => map(key).to(value)),
   
   // Brackets and braces
-  map("u").to("open_bracket"), // [
-  map("i").to("close_bracket"), // ]
-  map({ key_code: "u", modifiers: { mandatory: ["left_shift"] } }).to("open_bracket", "left_shift"), // {
-  map({ key_code: "i", modifiers: { mandatory: ["left_shift"] } }).to("close_bracket", "left_shift"), // }
+  withMapper({
+    u: "open_bracket", // [
+    i: "close_bracket", // ]
+  })((key, value) => map(key).to(value)),
+  
+  withMapper({
+    u: ["open_bracket", "left_shift"], // {
+    i: ["close_bracket", "left_shift"], // }
+  })((key, value) => 
+    map({ key_code: key, modifiers: { mandatory: ["left_shift"] } }).to(value[0], value[1])
+  ),
   
   // Parentheses and angle brackets
-  map("n").to("9", "left_shift"), // (
-  map("m").to("0", "left_shift"), // )
-  map({ key_code: "n", modifiers: { mandatory: ["left_shift"] } }).to("comma", "left_shift"), // <
-  map({ key_code: "m", modifiers: { mandatory: ["left_shift"] } }).to("period", "left_shift"), // >
+  withMapper({
+    n: ["9", "left_shift"], // (
+    m: ["0", "left_shift"], // )
+  })((key, value) => map(key).to(value[0], value[1])),
+  
+  withMapper({
+    n: ["comma", "left_shift"], // <
+    m: ["period", "left_shift"], // >
+  })((key, value) => 
+    map({ key_code: key, modifiers: { mandatory: ["left_shift"] } }).to(value[0], value[1])
+  ),
   
   // Common symbols
-  map("y").to("hyphen", "left_shift"), // underscore _
-  map("p").to("backslash", "left_shift"), // pipe |
-  map("o").to("backslash"), // backslash \
-  map(";").to("equal_sign"), // equals =
-  map({ key_code: ";", modifiers: { mandatory: ["left_shift"] } }).to("equal_sign", "left_shift"), // plus +
+  withMapper({
+    y: ["hyphen", "left_shift"], // underscore _
+    p: ["backslash", "left_shift"], // pipe |
+    o: "backslash", // backslash \
+    ";": "equal_sign", // equals =
+  })((key, value) => {
+    if (Array.isArray(value)) {
+      return map(key).to(value[0], value[1]);
+    }
+    return map(key).to(value);
+  }),
+  
+  // Semicolon with shift -> plus
+  map({ key_code: ";", modifiers: { mandatory: ["left_shift"] } }).to("equal_sign", "left_shift"),
   
   // Additional useful symbols
-  map("'").to("grave_accent_and_tilde"), // backtick `
-  map({ key_code: "'", modifiers: { mandatory: ["left_shift"] } }).to("grave_accent_and_tilde", "left_shift"), // tilde ~
-  map(",").to("hyphen"), // dash/hyphen -
-  map(".").to("equal_sign", "left_shift"), // plus +
-  map("/").to("backslash", "left_shift"), // pipe |
+  withMapper({
+    "'": "grave_accent_and_tilde", // backtick `
+    ",": "hyphen", // dash/hyphen -
+    ".": ["equal_sign", "left_shift"], // plus +
+    "/": ["backslash", "left_shift"], // pipe |
+  })((key, value) => {
+    if (Array.isArray(value)) {
+      return map(key).to(value[0], value[1]);
+    }
+    return map(key).to(value);
+  }),
+  
+  // Quote with shift -> tilde
+  map({ key_code: "'", modifiers: { mandatory: ["left_shift"] } }).to("grave_accent_and_tilde", "left_shift"),
   
   // Numbers for quick access (shifted symbols)
-  map("1").to("1", "left_shift"), // !
-  map("2").to("2", "left_shift"), // @
-  map("3").to("3", "left_shift"), // #
-  map("4").to("4", "left_shift"), // $
-  map("5").to("5", "left_shift"), // %
-  map("6").to("6", "left_shift"), // ^
-  map("7").to("7", "left_shift"), // &
-  map("8").to("8", "left_shift"), // *
+  withMapper({
+    1: "1", // !
+    2: "2", // @
+    3: "3", // #
+    4: "4", // $
+    5: "5", // %
+    6: "6", // ^
+    7: "7", // &
+    8: "8", // *
+  })((key, value) => map(key).to(value, "left_shift")),
 ]);
 
 writeToProfile(
