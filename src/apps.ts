@@ -138,6 +138,7 @@ export const leaderNavigationOnWe = duoLayer("w", "e")
 
 export const dynamicNavigation = [
     navigationOnTab,
-    stickyNavigationOnIO,
-    leaderNavigationOnWe
+    // sticking to just tab for now
+    // stickyNavigationOnIO,
+    // leaderNavigationOnWe
 ]
