@@ -35,6 +35,7 @@ import {
 } from "./lib.ts";
 import { firefoxCommandMode } from "./browser.ts";
 import { windowLayer } from "./window-management.ts";
+import { symbolsMode } from "./symbols.ts";
 import { join } from "path";
 import { escape } from "querystring";
 import { dynamicNavigation, navigationOnTab, stickyNavigationOnIO } from "./apps.ts";
@@ -260,6 +261,7 @@ writeToProfile(
     ...launcherMode.build(),
     ...itermCommandMode.build(),
     ...firefoxCommandMode.build(),
+    ...symbolsMode,
     // ...windowManagementMode.build(),
     // !important this needs to happen after all modes are defined
     // Any extra re-mapping of Escape key needs to be done here as well
